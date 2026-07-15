@@ -1,715 +1,780 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SOCSO Radar — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:        #080C14;
-    --surface:   #0F1623;
-    --surface2:  #161E2E;
-    --border:    #1E2D42;
-    --green:     #10B981;
-    --green-dim: #064E3B;
-    --red:       #F87171;
-    --red-dim:   #450A0A;
-    --amber:     #FBBF24;
-    --muted:     #4B5563;
-    --sub:       #6B7280;
-    --text:      #E2E8F0;
-    --bright:    #F8FAFC;
-    --mono:      'JetBrains Mono', monospace;
-    --sans:      'Inter', sans-serif;
-    --radius:    8px;
-  }
+/* ── Theme tokens ──────────────────────────────────────────────────────────── */
+:root {
+  --radius: 10px;
+  --radius-sm: 6px;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+  --transition: .18s ease;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+[data-theme="dark"] {
+  --bg:         #0A0E17;
+  --bg2:        #0F1623;
+  --surface:    #131C2E;
+  --surface2:   #1A2540;
+  --border:     #1E2D42;
+  --border2:    #253350;
+  --text:       #E2E8F0;
+  --text2:      #94A3B8;
+  --text3:      #4B5563;
+  --bright:     #F8FAFC;
+  --green:      #10B981;
+  --green-bg:   rgba(16,185,129,.12);
+  --red:        #F87171;
+  --red-bg:     rgba(248,113,113,.10);
+  --blue:       #60A5FA;
+  --blue-bg:    rgba(96,165,250,.10);
+  --amber:      #FBBF24;
+  --amber-bg:   rgba(251,191,36,.10);
+  --pink:       #F472B6;
+  --shadow:     0 1px 3px rgba(0,0,0,.4);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,.5);
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
+[data-theme="light"] {
+  --bg:         #F1F5F9;
+  --bg2:        #E8EDF5;
+  --surface:    #FFFFFF;
+  --surface2:   #F8FAFC;
+  --border:     #E2E8F0;
+  --border2:    #CBD5E1;
+  --text:       #1E293B;
+  --text2:      #475569;
+  --text3:      #94A3B8;
+  --bright:     #0F172A;
+  --green:      #059669;
+  --green-bg:   rgba(5,150,105,.08);
+  --red:        #DC2626;
+  --red-bg:     rgba(220,38,38,.07);
+  --blue:       #2563EB;
+  --blue-bg:    rgba(37,99,235,.08);
+  --amber:      #D97706;
+  --amber-bg:   rgba(217,119,6,.08);
+  --pink:       #DB2777;
+  --shadow:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-lg:  0 10px 40px rgba(0,0,0,.12);
+}
 
-  /* ── Header ── */
-  header {
-    border-bottom: 1px solid var(--border);
-    padding: 18px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 10;
-  }
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
 
-  .logo { display: flex; align-items: center; gap: 12px; }
+/* ── Header ────────────────────────────────────────────────────────────────── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow);
+}
 
-  .radar-icon {
-    width: 32px; height: 32px;
-    border: 2px solid var(--green);
-    border-radius: 50%;
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .radar-icon::before {
-    content: '';
-    width: 14px; height: 14px;
-    border: 1.5px solid var(--green);
-    border-radius: 50%;
-    opacity: .5;
-  }
-  .radar-icon::after {
-    content: '';
-    position: absolute;
-    width: 50%; height: 2px;
-    background: var(--green);
-    top: 50%; left: 50%;
-    transform-origin: left center;
-    animation: sweep 3s linear infinite;
-  }
-  @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 
-  .logo-text h1 { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--bright); letter-spacing: .5px; }
-  .logo-text p  { font-size: 11px; color: var(--sub); margin-top: 1px; }
+.logo-icon {
+  width: 34px; height: 34px;
+  background: var(--green);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden; flex-shrink: 0;
+}
+.logo-icon::before {
+  content: '';
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,.9);
+  border-radius: 50%;
+  position: absolute;
+}
+.logo-icon::after {
+  content: '';
+  width: 50%; height: 2.5px;
+  background: white;
+  position: absolute;
+  left: 50%; top: 50%;
+  transform-origin: left center;
+  animation: sweep 3s linear infinite;
+}
+@keyframes sweep { to { transform: rotate(360deg); } }
 
-  .header-right { display: flex; align-items: center; gap: 16px; }
+.logo-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bright);
+  letter-spacing: -.2px;
+}
+.logo-tag {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 1px;
+  display: none;
+}
+@media(min-width:500px) { .logo-tag { display: block; } }
 
-  .live-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--sub); font-family: var(--mono); }
-  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
-  .pulse.error { background: var(--red); animation: none; }
-  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.7); } }
+.header-right { display: flex; align-items: center; gap: 10px; }
 
-  #refresh-btn {
-    background: none; border: 1px solid var(--border); color: var(--sub);
-    padding: 5px 12px; border-radius: var(--radius); cursor: pointer;
-    font-size: 12px; font-family: var(--sans); transition: border-color .2s, color .2s;
-  }
-  #refresh-btn:hover { border-color: var(--green); color: var(--green); }
+/* Live badge */
+.live-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--green-bg);
+  border: 1px solid var(--green);
+  border-opacity: .3;
+  color: var(--green);
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s ease-in-out infinite; }
+.dot.err { background: var(--red); animation: none; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-  /* ── Main ── */
-  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+/* Theme toggle */
+.theme-btn {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all var(--transition);
+}
+.theme-btn:hover { border-color: var(--green); color: var(--green); }
 
-  /* ── Stats ── */
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
+/* Refresh btn */
+.refresh-btn {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--sans);
+  font-weight: 500;
+  transition: all var(--transition);
+  display: flex; align-items: center; gap: 6px;
+}
+.refresh-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
 
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
-  .stat-card.green { border-left: 3px solid var(--green); }
-  .stat-card.red   { border-left: 3px solid var(--red); }
-  .stat-card.amber { border-left: 3px solid var(--amber); }
-  .stat-card.plain { border-left: 3px solid var(--muted); }
-  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--sub); font-family: var(--mono); margin-bottom: 8px; }
-  .stat-value { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--bright); line-height: 1; }
-  .stat-sub   { font-size: 11px; color: var(--sub); margin-top: 6px; }
+/* ── Main layout ───────────────────────────────────────────────────────────── */
+main { max-width: 1280px; margin: 0 auto; padding: 28px 20px 60px; }
 
-  /* ── Section header ── */
-  .section-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
-  .section-title  { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--bright); display: flex; align-items: center; gap: 8px; }
-  .badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 600; font-family: var(--mono); }
-  .badge.green { background: var(--green-dim); color: var(--green); }
-  .badge.red   { background: var(--red-dim);   color: var(--red); }
+/* ── Stat cards ────────────────────────────────────────────────────────────── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 32px; }
 
-  /* ── Search ── */
-  #search {
-    background: var(--surface); border: 1px solid var(--border); color: var(--text);
-    padding: 7px 12px; border-radius: var(--radius); font-size: 13px;
-    font-family: var(--mono); width: 240px; outline: none; transition: border-color .2s;
-  }
-  #search:focus { border-color: var(--green); }
-  #search::placeholder { color: var(--muted); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: background var(--transition), border-color var(--transition);
+}
 
-  /* ── Table ── */
-  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 28px; }
-  table { width: 100%; border-collapse: collapse; }
-  thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
-  th {
-    padding: 10px 14px; text-align: left; font-family: var(--mono);
-    font-size: 11px; font-weight: 600; color: var(--sub);
-    text-transform: uppercase; letter-spacing: .8px;
-    cursor: pointer; user-select: none; white-space: nowrap;
-  }
-  th:hover { color: var(--text); }
-  th.sorted .sort-arrow { color: var(--green); }
+.stat-card { padding: 20px 22px; }
+.stat-accent { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.stat-dot.green { background: var(--green); }
+.stat-dot.red   { background: var(--red); }
+.stat-dot.amber { background: var(--amber); }
+.stat-dot.blue  { background: var(--blue); }
+.stat-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); }
 
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background .1s;
-    cursor: pointer;
-  }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--surface2); }
+.stat-val { font-size: 32px; font-weight: 700; color: var(--bright); line-height: 1; font-family: var(--mono); }
+.stat-sub { font-size: 11px; color: var(--text3); margin-top: 6px; }
 
-  td { padding: 10px 14px; font-size: 13px; vertical-align: middle; }
+/* ── Section ───────────────────────────────────────────────────────────────── */
+.section { margin-bottom: 32px; }
+.section-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px; margin-bottom: 14px;
+}
+.section-title {
+  font-size: 13px; font-weight: 600; color: var(--bright);
+  display: flex; align-items: center; gap: 8px;
+}
+.count-badge {
+  font-size: 10px; font-weight: 700; font-family: var(--mono);
+  padding: 2px 8px; border-radius: 99px;
+}
+.count-badge.green { background: var(--green-bg); color: var(--green); }
+.count-badge.red   { background: var(--red-bg);   color: var(--red); }
 
-  .ic-num   { font-family: var(--mono); font-size: 12px; color: var(--green); letter-spacing: .5px; }
-  .name-cell { font-weight: 500; color: var(--bright); }
-  .dob-cell  { font-family: var(--mono); font-size: 12px; color: var(--sub); }
-  .gender-m  { color: #60A5FA; }
-  .gender-f  { color: #F472B6; }
-  .date-cell { font-family: var(--mono); font-size: 11px; color: var(--muted); }
-  .click-hint { font-size: 10px; color: var(--muted); font-family: var(--mono); }
+.hint { font-size: 11px; color: var(--text3); font-style: italic; }
 
-  /* ── Invalid panel ── */
-  .invalid-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 28px; }
-  .invalid-panel p { color: var(--sub); font-size: 13px; margin-top: 10px; line-height: 1.7; }
-  .invalid-panel strong { color: var(--text); }
+/* ── Search ────────────────────────────────────────────────────────────────── */
+.search-wrap { position: relative; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+#search {
+  width: 240px; height: 36px;
+  padding: 0 12px 0 34px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color var(--transition), width var(--transition);
+}
+#search:focus { border-color: var(--green); width: 280px; }
+#search::placeholder { color: var(--text3); }
 
-  /* ── Empty/loading ── */
-  .state-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 48px 24px; text-align: center; color: var(--sub); font-family: var(--mono); font-size: 13px; margin-bottom: 28px; }
-  .state-box .icon { font-size: 32px; margin-bottom: 12px; }
-  .state-box p { margin-top: 6px; line-height: 1.6; }
+/* ── Table ─────────────────────────────────────────────────────────────────── */
+.table-card { overflow: hidden; }
 
-  /* ══════════════════════════════════════════
-     MODAL
-  ══════════════════════════════════════════ */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.75);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    backdrop-filter: blur(4px);
-  }
-  .modal-overlay.open { display: flex; }
+.table-scroll { overflow-x: auto; }
 
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 680px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    animation: pop .18s ease;
-  }
-  @keyframes pop { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
 
-  .modal-header {
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    background: var(--surface);
-    z-index: 1;
-  }
-  .modal-ic   { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--green); letter-spacing: 1px; }
-  .modal-name { font-size: 15px; font-weight: 600; color: var(--bright); margin-top: 4px; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
 
-  .modal-close {
-    background: none; border: 1px solid var(--border); color: var(--sub);
-    width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
-    font-size: 16px; flex-shrink: 0; transition: all .15s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .modal-close:hover { border-color: var(--red); color: var(--red); }
+th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .8px;
+  color: var(--text2);
+  cursor: pointer; user-select: none; white-space: nowrap;
+  transition: color var(--transition);
+}
+th:hover { color: var(--green); }
+th.active { color: var(--green); }
+.arrow { margin-left: 4px; opacity: .5; }
+th.active .arrow { opacity: 1; }
 
-  .modal-body { padding: 20px 24px; }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
 
-  .modal-section { margin-bottom: 24px; }
-  .modal-section-title {
-    font-family: var(--mono); font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 1.5px;
-    color: var(--green); margin-bottom: 12px;
-    padding-bottom: 6px; border-bottom: 1px solid var(--green-dim);
-  }
+td { padding: 11px 16px; font-size: 13px; }
 
-  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media (max-width: 500px) { .field-grid { grid-template-columns: 1fr; } }
+.td-ic    { font-family: var(--mono); font-size: 12px; color: var(--green); font-weight: 600; letter-spacing: .3px; }
+.td-name  { font-weight: 600; color: var(--bright); }
+.td-dob   { font-family: var(--mono); font-size: 12px; color: var(--text2); }
+.td-male  { color: var(--blue); font-weight: 500; }
+.td-fem   { color: var(--pink); font-weight: 500; }
+.td-state { color: var(--text); }
+.td-date  { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.td-arrow { color: var(--text3); text-align: right; font-size: 14px; }
 
-  .field {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 12px;
-  }
-  .field.full { grid-column: 1 / -1; }
-  .field-label { font-size: 10px; font-family: var(--mono); color: var(--sub); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
-  .field-value { font-family: var(--mono); font-size: 13px; color: var(--bright); font-weight: 600; }
-  .field-value.null { color: var(--muted); font-weight: 400; font-style: italic; }
-  .field-value.green { color: var(--green); }
-  .field-value.red   { color: var(--red); }
-  .field-value.blue  { color: #60A5FA; }
-  .field-value.pink  { color: #F472B6; }
+/* ── Invalid panel ─────────────────────────────────────────────────────────── */
+.inv-panel {
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media(max-width:600px) { .inv-panel { grid-template-columns: 1fr; } }
 
-  /* ── Footer ── */
-  footer { text-align: center; color: var(--muted); font-size: 11px; font-family: var(--mono); padding-top: 12px; border-top: 1px solid var(--border); }
+.inv-stat { }
+.inv-stat-val { font-size: 24px; font-weight: 700; font-family: var(--mono); color: var(--red); }
+.inv-stat-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; }
 
-  @media (max-width: 640px) {
-    .hide-mobile { display: none; }
-    #search { width: 100%; }
-    .section-header { flex-direction: column; align-items: flex-start; }
-    .stat-value { font-size: 22px; }
-    td { padding: 8px 10px; }
-  }
+.inv-info { font-size: 12px; color: var(--text2); line-height: 1.7; border-left: 2px solid var(--border); padding-left: 16px; }
+.inv-info strong { color: var(--text); }
+
+/* ── Empty / loading ───────────────────────────────────────────────────────── */
+.empty { padding: 56px 24px; text-align: center; }
+.empty-icon { font-size: 36px; margin-bottom: 12px; }
+.empty-title { font-size: 14px; font-weight: 600; color: var(--bright); margin-bottom: 6px; }
+.empty-desc  { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(6px);
+}
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn .16s ease;
+}
+@keyframes modalIn { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.modal-head {
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.modal-ic-big { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--green); letter-spacing: 1px; }
+.modal-name-big { font-size: 16px; font-weight: 600; color: var(--bright); margin-top: 3px; }
+
+.close-btn {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface2);
+  color: var(--text2); cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition); flex-shrink: 0;
+}
+.close-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+.modal-body { padding: 22px 24px; }
+
+.m-section { margin-bottom: 26px; }
+.m-section-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--green);
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--green-bg);
+  display: flex; align-items: center; gap: 8px;
+}
+.m-section-title::before { content: ''; width: 3px; height: 12px; background: var(--green); border-radius: 2px; }
+
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media(max-width:480px) { .fields { grid-template-columns: 1fr; } }
+.field { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
+.field.span2 { grid-column: 1/-1; }
+.f-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--text3); margin-bottom: 4px; }
+.f-val { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--bright); word-break: break-all; }
+.f-val.null  { color: var(--text3); font-weight: 400; font-style: italic; font-size: 11px; }
+.f-val.green { color: var(--green); }
+.f-val.blue  { color: var(--blue); }
+.f-val.pink  { color: var(--pink); }
+.f-val.amber { color: var(--amber); }
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+footer {
+  max-width: 1280px; margin: 0 auto;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+  font-size: 11px; color: var(--text3); font-family: var(--mono);
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media(max-width:640px) {
+  .hide-sm { display: none; }
+  #search { width: 100%; }
+  .section-bar { flex-direction: column; align-items: flex-start; }
+}
 </style>
 </head>
 <body>
 
+<!-- ── Header ─────────────────────────────────────────────────────────────── -->
 <header>
-  <div class="logo">
-    <div class="radar-icon"></div>
-    <div class="logo-text">
-      <h1>SOCSO Radar</h1>
-      <p>PERKESO IC Lookup — Live Dashboard</p>
+  <a class="logo" href="#">
+    <div class="logo-icon"></div>
+    <div>
+      <div class="logo-name">SOCSO Radar</div>
+      <div class="logo-tag">PERKESO IC Lookup Dashboard</div>
     </div>
-  </div>
+  </a>
+
   <div class="header-right">
-    <div class="live-badge">
-      <div class="pulse" id="pulse-dot"></div>
-      <span id="status-text">Loading...</span>
+    <div class="live-pill">
+      <span class="dot" id="dot"></span>
+      <span id="status">Loading…</span>
     </div>
-    <button id="refresh-btn" onclick="loadData()">↻ Refresh</button>
+
+    <button class="theme-btn" id="theme-btn" title="Toggle light/dark mode" onclick="toggleTheme()">🌙</button>
+
+    <button class="refresh-btn" onclick="loadData()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      Refresh
+    </button>
   </div>
 </header>
 
+<!-- ── Main ───────────────────────────────────────────────────────────────── -->
 <main>
+
+  <!-- Stats -->
   <div class="stats">
-    <div class="stat-card green">
-      <div class="stat-label">Valid Records</div>
-      <div class="stat-value" id="s-valid">—</div>
+    <div class="card stat-card">
+      <div class="stat-accent"><span class="stat-dot green"></span><span class="stat-lbl">Valid Records</span></div>
+      <div class="stat-val" id="s-valid">—</div>
       <div class="stat-sub">confirmed in PERKESO</div>
     </div>
-    <div class="stat-card red">
-      <div class="stat-label">Invalid Cached</div>
-      <div class="stat-value" id="s-invalid">—</div>
-      <div class="stat-sub" id="s-invalid-sub">re-checked after 30 days</div>
+    <div class="card stat-card">
+      <div class="stat-accent"><span class="stat-dot red"></span><span class="stat-lbl">Invalid Cached</span></div>
+      <div class="stat-val" id="s-invalid">—</div>
+      <div class="stat-sub" id="s-inv-sub">re-checked after 30 days</div>
     </div>
-    <div class="stat-card amber">
-      <div class="stat-label">Hit Rate</div>
-      <div class="stat-value" id="s-rate">—</div>
-      <div class="stat-sub">valid / (valid + invalid)</div>
+    <div class="card stat-card">
+      <div class="stat-accent"><span class="stat-dot amber"></span><span class="stat-lbl">Hit Rate</span></div>
+      <div class="stat-val" id="s-rate">—</div>
+      <div class="stat-sub">valid / total checked</div>
     </div>
-    <div class="stat-card plain">
-      <div class="stat-label">Last Scan</div>
-      <div class="stat-value" style="font-size:16px;padding-top:6px" id="s-last">—</div>
-      <div class="stat-sub" id="s-last-sub">auto-runs 4× per day</div>
-    </div>
-  </div>
-
-  <div class="section-header">
-    <div class="section-title">
-      ✅ Valid Records
-      <span class="badge green" id="valid-count-badge">0</span>
-      <span class="click-hint">— click any row for full details</span>
-    </div>
-    <input type="text" id="search" placeholder="Search name, IC, state…" oninput="filterTable()">
-  </div>
-
-  <div id="valid-container">
-    <div class="state-box"><div class="icon">📡</div><p>Loading valid records…</p></div>
-  </div>
-
-  <div class="section-header">
-    <div class="section-title">
-      ❌ Invalid Cache
-      <span class="badge red" id="invalid-count-badge">0</span>
+    <div class="card stat-card">
+      <div class="stat-accent"><span class="stat-dot blue"></span><span class="stat-lbl">Last Scan</span></div>
+      <div class="stat-val" style="font-size:18px;padding-top:6px" id="s-last">—</div>
+      <div class="stat-sub" id="s-last-sub">auto-runs 4× daily</div>
     </div>
   </div>
 
-  <div class="invalid-panel">
-    <p><strong id="inv-count">—</strong> IC numbers confirmed not in PERKESO, cached to avoid repeat API calls.<br>
-       Entries expire after <strong>30 days</strong> and are automatically re-checked.</p>
-    <p style="margin-top:14px"><strong id="inv-expiring">—</strong> records expiring within 7 days will be re-queued soon.</p>
+  <!-- Valid table -->
+  <div class="section">
+    <div class="section-bar">
+      <div class="section-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Valid Records
+        <span class="count-badge green" id="v-badge">0</span>
+        <span class="hint hide-sm">— click row for full details</span>
+      </div>
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search" type="text" placeholder="Search name, IC, state…" oninput="filterTable()">
+      </div>
+    </div>
+    <div class="card table-card" id="v-container">
+      <div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div>
+    </div>
   </div>
+
+  <!-- Invalid -->
+  <div class="section">
+    <div class="section-bar">
+      <div class="section-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Invalid Cache
+        <span class="count-badge red" id="i-badge">0</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="inv-panel">
+        <div class="inv-stat">
+          <div class="inv-stat-val" id="i-count">—</div>
+          <div class="inv-stat-lbl">ICs confirmed not in PERKESO</div>
+          <div style="margin-top:12px;font-size:11px;color:var(--text3)" id="i-exp">—</div>
+        </div>
+        <div class="inv-info">
+          Entries are cached to <strong>avoid repeat API calls</strong>.<br>
+          They expire after <strong>30 days</strong> and get automatically re-checked —
+          a person may register with PERKESO at any time when they start a new job.
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
-<footer>SOCSO Radar &nbsp;·&nbsp; <span id="footer-ts">—</span></footer>
+<footer>
+  <span>SOCSO Radar · deadboy18.github.io/socso-radar</span>
+  <span id="footer-ts">—</span>
+</footer>
 
-<!-- ══════════════════ MODAL ══════════════════ -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal" id="modal">
-    <div class="modal-header">
+<!-- ── Modal ──────────────────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-head">
       <div>
-        <div class="modal-ic" id="m-ic">—</div>
-        <div class="modal-name" id="m-name">—</div>
+        <div class="modal-ic-big" id="m-ic">—</div>
+        <div class="modal-name-big" id="m-name">—</div>
       </div>
-      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
-    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-body" id="m-body"></div>
   </div>
 </div>
 
 <script>
 const VALID_URL   = './ic_results/master_valid.json';
 const INVALID_URL = './ic_results/master_invalid.json';
-const REFRESH_MS  = 10 * 60 * 1000;
 
 let validData   = [];
 let invalidData = [];
 let sortCol     = 'checked_at';
 let sortDir     = -1;
 
-// ── Race / Gender lookup ───────────────────────────────────────────────────
-const RACE = { 1:'Malay', 2:'Chinese', 3:'Indian', 4:'Others',
-               5:'Bumiputera Sabah', 6:'Bumiputera Sarawak', 7:'Other Bumiputera' };
-const GENDER = { 1:'Male', 2:'Female' };
-const NATIONALITY = { 0:'Malaysian', 1:'Malaysian' };
+const RACE   = {1:'Malay',2:'Chinese',3:'Indian',4:'Others',5:'Bumiputera Sabah',6:'Bumiputera Sarawak',7:'Other Bumiputera'};
+const GENDER = {1:'Male',2:'Female'};
 
-// ── Load ──────────────────────────────────────────────────────────────────
+// ── Theme ──────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  document.getElementById('theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('socso-theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('socso-theme') || 'dark';
+  document.documentElement.dataset.theme = saved;
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('theme-btn').textContent = saved === 'dark' ? '🌙' : '☀️';
+  });
+})();
+
+// ── Load ───────────────────────────────────────────────────────────────────
 async function loadData() {
   setStatus('Refreshing…', false);
   try {
-    const [vRes, iRes] = await Promise.all([
+    const [vr, ir] = await Promise.all([
       fetch(VALID_URL   + '?t=' + Date.now()),
       fetch(INVALID_URL + '?t=' + Date.now()),
     ]);
-    validData   = vRes.ok ? await vRes.json() : [];
-    invalidData = iRes.ok ? await iRes.json() : [];
+    validData   = vr.ok ? await vr.json() : [];
+    invalidData = ir.ok ? await ir.json() : [];
     if (!Array.isArray(validData))   validData   = [];
     if (!Array.isArray(invalidData)) invalidData = [];
-    renderAll();
-    setStatus('Live · ' + fmtNow(), false);
-  } catch (e) {
-    setStatus('Error loading data', true);
-    showEmpty('valid-container', '⚠️', 'Could not load master_valid.json',
-      'Make sure GitHub Pages is enabled and the first run has completed.');
+    render();
+    setStatus('Live · ' + fmtTime(), false);
+  } catch(e) {
+    setStatus('Error', true);
+    document.getElementById('v-container').innerHTML =
+      `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load data</div><div class="empty-desc">Ensure GitHub Pages is enabled and a scan has completed.</div></div>`;
   }
 }
 
-// ── Render all ────────────────────────────────────────────────────────────
-function renderAll() {
-  renderStats();
-  renderTable();
-  renderInvalid();
-  document.getElementById('footer-ts').textContent = 'last loaded ' + fmtNow();
-}
-
-function renderStats() {
-  const v = validData.length, i = invalidData.length, total = v + i;
-  document.getElementById('s-valid').textContent   = v.toLocaleString();
-  document.getElementById('s-invalid').textContent = i.toLocaleString();
-  document.getElementById('s-rate').textContent    = total > 0 ? ((v/total)*100).toFixed(1)+'%' : '—';
-  document.getElementById('valid-count-badge').textContent   = v;
-  document.getElementById('invalid-count-badge').textContent = i;
+// ── Render ─────────────────────────────────────────────────────────────────
+function render() {
+  // Stats
+  const v = validData.length, i = invalidData.length, tot = v + i;
+  setText('s-valid',   v.toLocaleString());
+  setText('s-invalid', i.toLocaleString());
+  setText('s-rate',    tot > 0 ? ((v/tot)*100).toFixed(1) + '%' : '—');
+  setText('v-badge',   v);
+  setText('i-badge',   i);
+  setText('i-count',   i.toLocaleString());
 
   const dates = validData.map(r => r.checked_at).filter(Boolean).sort();
   if (dates.length) {
-    const last = dates[dates.length - 1];
-    document.getElementById('s-last').textContent    = last.split(' ')[0];
-    document.getElementById('s-last-sub').textContent = (last.split(' ')[1]||'') + ' UTC';
+    const last = dates[dates.length-1];
+    setText('s-last',     last.split(' ')[0]);
+    setText('s-last-sub', (last.split(' ')[1]||'') + ' UTC');
   }
 
-  const cutoff7 = new Date(); cutoff7.setDate(cutoff7.getDate() - 23);
-  const exp = invalidData.filter(e => { try { return new Date(e.t) < cutoff7; } catch { return false; } }).length;
-  document.getElementById('s-invalid-sub').textContent = i > 0 ? `${exp} expiring within 7 days` : 'no cached invalids yet';
+  const cut7 = new Date(); cut7.setDate(cut7.getDate()-23);
+  const exp  = invalidData.filter(e => { try { return new Date(e.t)<cut7; } catch{return false;} }).length;
+  setText('s-inv-sub', i > 0 ? `${exp} expiring within 7 days` : 'none cached yet');
+  setText('i-exp',     `${exp} records expiring within 7 days will be re-queued soon`);
+
+  // Table
+  renderTable();
+
+  document.getElementById('footer-ts').textContent = 'auto-refreshes every 10 min · loaded ' + fmtTime();
 }
 
 function renderTable() {
-  const c = document.getElementById('valid-container');
+  const c = document.getElementById('v-container');
   if (!validData.length) {
-    showEmpty('valid-container', '📡', 'No valid records yet',
-      'The script hasn\'t found any valid PERKESO ICs yet.<br>Trigger a workflow run or wait for the scheduled scan.');
+    c.innerHTML = `<div class="empty"><div class="empty-icon">📡</div><div class="empty-title">No valid records yet</div><div class="empty-desc">Trigger a workflow run or wait for the next scheduled scan.</div></div>`;
     return;
   }
 
-  const sorted = [...validData].sort((a, b) => {
-    const va = String(a[sortCol] || '');
-    const vb = String(b[sortCol] || '');
+  const sorted = [...validData].sort((a,b) => {
+    const va = String(a[sortCol]||''), vb = String(b[sortCol]||'');
     return va < vb ? sortDir : va > vb ? -sortDir : 0;
   });
 
   const cols = [
-    { key:'ic_formatted',  label:'IC Number' },
-    { key:'name',          label:'Name' },
-    { key:'date_of_birth', label:'DOB' },
-    { key:'gender',        label:'Gender' },
-    { key:'pb_name',       label:'State' },
-    { key:'checked_at',    label:'Checked' },
+    {key:'ic_formatted',  lbl:'IC Number'},
+    {key:'name',          lbl:'Name'},
+    {key:'date_of_birth', lbl:'DOB'},
+    {key:'gender',        lbl:'Gender'},
+    {key:'pb_name',       lbl:'State'},
+    {key:'checked_at',    lbl:'Checked'},
   ];
 
-  const headerCells = cols.map(col => {
-    const arrow = sortCol === col.key ? (sortDir === 1 ? '↑' : '↓') : '↕';
-    return `<th class="${sortCol===col.key?'sorted':''}" onclick="sortBy('${col.key}')">
-      ${col.label} <span class="sort-arrow">${arrow}</span>
-    </th>`;
-  }).join('');
+  const ths = cols.map(c => {
+    const a = c.key === sortCol ? (sortDir===1?'↑':'↓') : '↕';
+    return `<th class="${c.key===sortCol?'active':''}" onclick="sortBy('${c.key}')">${c.lbl}<span class="arrow">${a}</span></th>`;
+  }).join('') + '<th></th>';
 
-  const rows = sorted.map((r, idx) => {
-    const pdata  = r.perkeso_response?.debug?.data?.[0] || {};
-    const name   = pdata.name || r.name || '—';
-    const gender = r.gender || (pdata.genderId===1 ? 'Male' : 'Female');
-    const gClass = gender === 'Male' ? 'gender-m' : 'gender-f';
-    const checked = (r.checked_at||'').split(' ')[0];
-    const origIdx = validData.indexOf(r);
-    return `<tr onclick="openModal(${origIdx})" title="Click to see full PERKESO record">
-      <td class="ic-num">${esc(r.ic_formatted||r.ic_number||'—')}</td>
-      <td class="name-cell">${esc(name)}</td>
-      <td class="dob-cell">${esc(r.date_of_birth||pdata.dob||'—')}</td>
-      <td class="${gClass}">${esc(gender)}</td>
-      <td class="state-cell">${esc(r.pb_name||'—')}</td>
-      <td class="date-cell">${esc(checked)}</td>
+  const trs = sorted.map(r => {
+    const pd   = r.perkeso_response?.debug?.data?.[0] || {};
+    const name = pd.name || '—';
+    const gen  = r.gender || (pd.genderId===1?'Male':'Female');
+    const gc   = gen==='Male' ? 'td-male' : 'td-fem';
+    const oi   = validData.indexOf(r);
+    return `<tr onclick="openModal(${oi})">
+      <td class="td-ic">${x(r.ic_formatted||r.ic_number||'—')}</td>
+      <td class="td-name">${x(name)}</td>
+      <td class="td-dob">${x(r.date_of_birth||pd.dob||'—')}</td>
+      <td class="${gc}">${x(gen)}</td>
+      <td class="td-state">${x(r.pb_name||'—')}</td>
+      <td class="td-date">${x((r.checked_at||'').split(' ')[0])}</td>
+      <td class="td-arrow">›</td>
     </tr>`;
   }).join('');
 
-  c.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr>${headerCells}</tr></thead>
-    <tbody id="valid-tbody">${rows}</tbody>
-  </table></div>`;
+  c.innerHTML = `<div class="table-scroll"><table><thead><tr>${ths}</tr></thead><tbody id="tbody">${trs}</tbody></table></div>`;
 }
 
-function renderInvalid() {
-  document.getElementById('inv-count').textContent = invalidData.length.toLocaleString();
-  const cutoff7 = new Date(); cutoff7.setDate(cutoff7.getDate() - 23);
-  const exp = invalidData.filter(e => { try { return new Date(e.t) < cutoff7; } catch { return false; } }).length;
-  document.getElementById('inv-expiring').textContent = exp.toLocaleString();
-}
-
-// ── Modal ─────────────────────────────────────────────────────────────────
+// ── Modal ──────────────────────────────────────────────────────────────────
 function openModal(idx) {
-  const r     = validData[idx];
-  const pdata = r.perkeso_response?.debug?.data?.[0] || {};
-  const name  = pdata.name || r.name || '—';
+  const r  = validData[idx];
+  const pd = r.perkeso_response?.debug?.data?.[0] || {};
+  const name = pd.name || r.name || '—';
+  const gen  = GENDER[pd.genderId] || r.gender || '—';
+  const gc   = gen==='Male' ? 'blue' : 'pink';
 
-  document.getElementById('m-ic').textContent   = r.ic_formatted || r.ic_number || '—';
-  document.getElementById('m-name').textContent = name;
+  setText('m-ic',   r.ic_formatted || r.ic_number || '—');
+  setText('m-name', name);
 
-  const gender = GENDER[pdata.genderId] || r.gender || '—';
-  const race   = RACE[pdata.raceId]     || '—';
-  const gClass = gender === 'Male' ? 'blue' : 'pink';
-
-  function fv(val, cls='') {
-    if (val === null || val === undefined || val === '' || val === 'null') {
-      return `<div class="field-value null">null</div>`;
-    }
-    return `<div class="field-value ${cls}">${esc(String(val))}</div>`;
+  function f(val, cls='') {
+    const v = (val===null||val===undefined||val==='')?null:String(val);
+    if (!v || v==='null') return `<div class="f-val null">null</div>`;
+    return `<div class="f-val ${cls}">${x(v)}</div>`;
+  }
+  function row(lbl, val, cls='', span=false) {
+    return `<div class="field${span?' span2':''}"><div class="f-lbl">${lbl}</div>${f(val,cls)}</div>`;
   }
 
-  document.getElementById('modal-body').innerHTML = `
-
-    <div class="modal-section">
-      <div class="modal-section-title">Personal Information</div>
-      <div class="field-grid">
-        <div class="field">
-          <div class="field-label">IC Number</div>
-          ${fv(pdata.identificationNo || r.ic_number, 'green')}
-        </div>
-        <div class="field">
-          <div class="field-label">ID Type</div>
-          ${fv(pdata.idType === '2' ? 'MyKad (2)' : pdata.idType)}
-        </div>
-        <div class="field full">
-          <div class="field-label">Full Name</div>
-          ${fv(name, 'green')}
-        </div>
-        <div class="field">
-          <div class="field-label">Date of Birth</div>
-          ${fv(pdata.dob || r.date_of_birth)}
-        </div>
-        <div class="field">
-          <div class="field-label">Gender</div>
-          ${fv(gender, gClass)}
-        </div>
-        <div class="field">
-          <div class="field-label">Race</div>
-          ${fv(race)}
-        </div>
-        <div class="field">
-          <div class="field-label">Date of Death</div>
-          ${fv(pdata.dateOfDeath)}
-        </div>
-        <div class="field">
-          <div class="field-label">Foreign Worker</div>
-          ${fv(pdata.isForeignWorker !== undefined ? String(pdata.isForeignWorker) : null)}
-        </div>
+  document.getElementById('m-body').innerHTML = `
+    <div class="m-section">
+      <div class="m-section-title">Personal Information</div>
+      <div class="fields">
+        ${row('IC Number', pd.identificationNo||r.ic_number, 'green', true)}
+        ${row('Full Name', name, 'green', true)}
+        ${row('Date of Birth', pd.dob||r.date_of_birth)}
+        ${row('Gender', gen, gc)}
+        ${row('Race', RACE[pd.raceId]||null)}
+        ${row('Foreign Worker', pd.isForeignWorker!==undefined ? String(pd.isForeignWorker) : null)}
+        ${row('Date of Death', pd.dateOfDeath)}
+        ${row('ID Type', pd.idType==='2'?'MyKad (2)':pd.idType)}
       </div>
     </div>
 
-    <div class="modal-section">
-      <div class="modal-section-title">Employment</div>
-      <div class="field-grid">
-        <div class="field">
-          <div class="field-label">Start Date (Act 4 — SOCSO)</div>
-          ${fv(pdata.employmentStartDateAct4)}
-        </div>
-        <div class="field">
-          <div class="field-label">Start Date (Act 800 — EIS)</div>
-          ${fv(pdata.employmentStartDateAct800)}
-        </div>
-        <div class="field">
-          <div class="field-label">Last Contribution Act 4</div>
-          ${fv(pdata.lastContbAct4)}
-        </div>
-        <div class="field">
-          <div class="field-label">Last Amount Act 4</div>
-          ${fv(pdata.lastContbAct4Amount)}
-        </div>
-        <div class="field">
-          <div class="field-label">Last Contribution Act 800</div>
-          ${fv(pdata.lastContbAct800)}
-        </div>
-        <div class="field">
-          <div class="field-label">Last Amount Act 800</div>
-          ${fv(pdata.lastContbAct800Amount)}
-        </div>
+    <div class="m-section">
+      <div class="m-section-title">Employment</div>
+      <div class="fields">
+        ${row('SOCSO Start (Act 4)', pd.employmentStartDateAct4, 'amber')}
+        ${row('EIS Start (Act 800)', pd.employmentStartDateAct800, 'amber')}
+        ${row('Last Contribution Act 4', pd.lastContbAct4)}
+        ${row('Last Amount Act 4', pd.lastContbAct4Amount)}
+        ${row('Last Contribution Act 800', pd.lastContbAct800)}
+        ${row('Last Amount Act 800', pd.lastContbAct800Amount)}
       </div>
     </div>
 
-    <div class="modal-section">
-      <div class="modal-section-title">Address</div>
-      <div class="field-grid">
-        <div class="field full">
-          <div class="field-label">Address Line 1</div>
-          ${fv(pdata.addressLine1)}
-        </div>
-        <div class="field full">
-          <div class="field-label">Address Line 2</div>
-          ${fv(pdata.addressLine2)}
-        </div>
-        <div class="field full">
-          <div class="field-label">Address Line 3</div>
-          ${fv(pdata.addressLine3)}
-        </div>
-        <div class="field">
-          <div class="field-label">Postcode</div>
-          ${fv(pdata.postcode)}
-        </div>
-        <div class="field">
-          <div class="field-label">City</div>
-          ${fv(pdata.individualCity)}
-        </div>
-        <div class="field">
-          <div class="field-label">State</div>
-          ${fv(pdata.individualState || r.pb_name)}
-        </div>
-        <div class="field">
-          <div class="field-label">Country</div>
-          ${fv(pdata.individualCountry)}
-        </div>
+    <div class="m-section">
+      <div class="m-section-title">Address</div>
+      <div class="fields">
+        ${row('Address Line 1', pd.addressLine1, '', true)}
+        ${row('Address Line 2', pd.addressLine2, '', true)}
+        ${row('Address Line 3', pd.addressLine3, '', true)}
+        ${row('Postcode', pd.postcode)}
+        ${row('City', pd.individualCity)}
+        ${row('State', pd.individualState||r.pb_name)}
+        ${row('Country', pd.individualCountry)}
       </div>
     </div>
 
-    <div class="modal-section">
-      <div class="modal-section-title">Next of Kin</div>
-      <div class="field-grid">
-        <div class="field full">
-          <div class="field-label">Name</div>
-          ${fv(pdata.nextOfKinName)}
-        </div>
-        <div class="field">
-          <div class="field-label">Relationship</div>
-          ${fv(pdata.nextOfKinRelationship)}
-        </div>
-        <div class="field">
-          <div class="field-label">Phone</div>
-          ${fv(pdata.nextOfKinPhoneNo)}
-        </div>
-        <div class="field">
-          <div class="field-label">Email</div>
-          ${fv(pdata.nextOfKinEmail)}
-        </div>
-        <div class="field full">
-          <div class="field-label">Address</div>
-          ${fv([pdata.nextOfKinAddress1, pdata.nextOfKinAddress2, pdata.nextOfKinAddress3].filter(Boolean).join(', ') || null)}
-        </div>
+    <div class="m-section">
+      <div class="m-section-title">Next of Kin</div>
+      <div class="fields">
+        ${row('Name', pd.nextOfKinName, '', true)}
+        ${row('Relationship', pd.nextOfKinRelationship)}
+        ${row('Phone', pd.nextOfKinPhoneNo)}
+        ${row('Email', pd.nextOfKinEmail, '', true)}
+        ${row('Address 1', pd.nextOfKinAddress1, '', true)}
+        ${row('Address 2', pd.nextOfKinAddress2, '', true)}
+        ${row('Address 3', pd.nextOfKinAddress3, '', true)}
       </div>
     </div>
 
-    <div class="modal-section">
-      <div class="modal-section-title">Passport / Work Permit</div>
-      <div class="field-grid">
-        <div class="field">
-          <div class="field-label">Passport No</div>
-          ${fv(pdata.passport)}
-        </div>
-        <div class="field">
-          <div class="field-label">Passport Valid</div>
-          ${fv(pdata.passportStartDate && pdata.passportEndDate ? pdata.passportStartDate + ' → ' + pdata.passportEndDate : null)}
-        </div>
-        <div class="field">
-          <div class="field-label">Work Permit</div>
-          ${fv(pdata.workingPermit)}
-        </div>
-        <div class="field">
-          <div class="field-label">Permit Valid</div>
-          ${fv(pdata.permitStartDate && pdata.permitEndDate ? pdata.permitStartDate + ' → ' + pdata.permitEndDate : null)}
-        </div>
+    <div class="m-section">
+      <div class="m-section-title">Passport / Work Permit</div>
+      <div class="fields">
+        ${row('Passport No', pd.passport)}
+        ${row('Passport Start', pd.passportStartDate)}
+        ${row('Passport End', pd.passportEndDate)}
+        ${row('Work Permit', pd.workingPermit)}
+        ${row('Permit Start', pd.permitStartDate)}
+        ${row('Permit End', pd.permitEndDate)}
       </div>
     </div>
 
-    <div class="modal-section">
-      <div class="modal-section-title">Scan Metadata</div>
-      <div class="field-grid">
-        <div class="field">
-          <div class="field-label">Checked At</div>
-          ${fv(r.checked_at)}
-        </div>
-        <div class="field">
-          <div class="field-label">Place of Birth Code</div>
-          ${fv(r.pb_code + ' — ' + (r.pb_name||''))}
-        </div>
-        <div class="field">
-          <div class="field-label">Sequence</div>
-          ${fv(r.sequence)}
-        </div>
-        <div class="field">
-          <div class="field-label">Check Digit</div>
-          ${fv(r.check_digit)}
-        </div>
+    <div class="m-section">
+      <div class="m-section-title">Scan Metadata</div>
+      <div class="fields">
+        ${row('Checked At', r.checked_at)}
+        ${row('State Code', r.pb_code + ' — ' + (r.pb_name||''))}
+        ${row('Sequence', r.sequence)}
+        ${row('Check Digit', r.check_digit)}
+        ${row('Gender Rule', (r.check_digit%2===1)?'Odd → Male':'Even → Female')}
+        ${row('Century Rule', r.century_rule)}
       </div>
     </div>
   `;
 
-  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
-function closeModal(e) {
-  if (e.target === document.getElementById('modal-overlay')) closeModalDirect();
-}
-function closeModalDirect() {
-  document.getElementById('modal-overlay').classList.remove('open');
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
   document.body.style.overflow = '';
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+function overlayClick(e) { if (e.target===document.getElementById('overlay')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
 
-// ── Search / Sort ─────────────────────────────────────────────────────────
+// ── Sort / search ──────────────────────────────────────────────────────────
+function sortBy(col) {
+  sortDir = sortCol===col ? sortDir*-1 : -1;
+  sortCol = col;
+  renderTable();
+}
 function filterTable() {
   const q = document.getElementById('search').value.toLowerCase();
-  document.querySelectorAll('#valid-tbody tr').forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  document.querySelectorAll('#tbody tr').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
   });
 }
 
-function sortBy(col) {
-  sortCol = col; sortDir = sortCol === col ? sortDir * -1 : -1;
-  renderTable();
+// ── Helpers ────────────────────────────────────────────────────────────────
+function setText(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+function x(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtTime() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function setStatus(msg, err) {
+  setText('status', msg);
+  document.getElementById('dot').className = 'dot' + (err?' err':'');
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
-function setStatus(msg, isError) {
-  document.getElementById('status-text').textContent = msg;
-  document.getElementById('pulse-dot').className = 'pulse' + (isError ? ' error' : '');
-}
-function showEmpty(id, icon, title, body) {
-  document.getElementById(id).innerHTML = `<div class="state-box"><div class="icon">${icon}</div><strong style="color:var(--text)">${title}</strong><p>${body}</p></div>`;
-}
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function fmtNow() {
-  return new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-}
-
-// ── Boot ─────────────────────────────────────────────────────────────────
+// ── Boot ───────────────────────────────────────────────────────────────────
 loadData();
-setInterval(loadData, REFRESH_MS);
+setInterval(loadData, 10 * 60 * 1000);
 </script>
 </body>
 </html>
