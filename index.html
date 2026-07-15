@@ -52,20 +52,14 @@
     z-index: 10;
   }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .logo { display: flex; align-items: center; gap: 12px; }
 
   .radar-icon {
     width: 32px; height: 32px;
     border: 2px solid var(--green);
     border-radius: 50%;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
   .radar-icon::before {
@@ -84,254 +78,179 @@
     transform-origin: left center;
     animation: sweep 3s linear infinite;
   }
-  @keyframes sweep {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
+  @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-  .logo-text h1 {
-    font-family: var(--mono);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--bright);
-    letter-spacing: .5px;
-  }
-  .logo-text p {
-    font-size: 11px;
-    color: var(--sub);
-    margin-top: 1px;
-  }
+  .logo-text h1 { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--bright); letter-spacing: .5px; }
+  .logo-text p  { font-size: 11px; color: var(--sub); margin-top: 1px; }
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+  .header-right { display: flex; align-items: center; gap: 16px; }
 
-  .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--sub);
-    font-family: var(--mono);
-  }
-  .pulse {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 2s ease-in-out infinite;
-  }
+  .live-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--sub); font-family: var(--mono); }
+  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
   .pulse.error { background: var(--red); animation: none; }
-  @keyframes pulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: .4; transform: scale(.7); }
-  }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.7); } }
 
   #refresh-btn {
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--sub);
-    padding: 5px 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 12px;
-    font-family: var(--sans);
-    transition: border-color .2s, color .2s;
+    background: none; border: 1px solid var(--border); color: var(--sub);
+    padding: 5px 12px; border-radius: var(--radius); cursor: pointer;
+    font-size: 12px; font-family: var(--sans); transition: border-color .2s, color .2s;
   }
   #refresh-btn:hover { border-color: var(--green); color: var(--green); }
 
-  /* ── Main layout ── */
+  /* ── Main ── */
   main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
 
-  /* ── Stat cards ── */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-    margin-bottom: 28px;
-  }
+  /* ── Stats ── */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
 
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
-  }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
   .stat-card.green { border-left: 3px solid var(--green); }
   .stat-card.red   { border-left: 3px solid var(--red); }
   .stat-card.amber { border-left: 3px solid var(--amber); }
   .stat-card.plain { border-left: 3px solid var(--muted); }
-
-  .stat-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--sub);
-    font-family: var(--mono);
-    margin-bottom: 8px;
-  }
-  .stat-value {
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--bright);
-    line-height: 1;
-  }
-  .stat-sub {
-    font-size: 11px;
-    color: var(--sub);
-    margin-top: 6px;
-  }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--sub); font-family: var(--mono); margin-bottom: 8px; }
+  .stat-value { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--bright); line-height: 1; }
+  .stat-sub   { font-size: 11px; color: var(--sub); margin-top: 6px; }
 
   /* ── Section header ── */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .section-title {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--bright);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .badge {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 99px;
-    font-weight: 600;
-    font-family: var(--mono);
-  }
+  .section-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .section-title  { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--bright); display: flex; align-items: center; gap: 8px; }
+  .badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 600; font-family: var(--mono); }
   .badge.green { background: var(--green-dim); color: var(--green); }
   .badge.red   { background: var(--red-dim);   color: var(--red); }
 
-  /* ── Search bar ── */
+  /* ── Search ── */
   #search {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 7px 12px;
-    border-radius: var(--radius);
-    font-size: 13px;
-    font-family: var(--mono);
-    width: 240px;
-    outline: none;
-    transition: border-color .2s;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 12px; border-radius: var(--radius); font-size: 13px;
+    font-family: var(--mono); width: 240px; outline: none; transition: border-color .2s;
   }
   #search:focus { border-color: var(--green); }
   #search::placeholder { color: var(--muted); }
 
   /* ── Table ── */
-  .table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 28px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  thead tr {
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-  }
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 28px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
   th {
-    padding: 10px 14px;
-    text-align: left;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--sub);
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
+    padding: 10px 14px; text-align: left; font-family: var(--mono);
+    font-size: 11px; font-weight: 600; color: var(--sub);
+    text-transform: uppercase; letter-spacing: .8px;
+    cursor: pointer; user-select: none; white-space: nowrap;
   }
   th:hover { color: var(--text); }
-  th .sort-arrow { margin-left: 4px; opacity: .4; }
-  th.sorted .sort-arrow { opacity: 1; color: var(--green); }
+  th.sorted .sort-arrow { color: var(--green); }
 
   tbody tr {
     border-bottom: 1px solid var(--border);
     transition: background .1s;
+    cursor: pointer;
   }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--surface2); }
 
-  td {
-    padding: 10px 14px;
-    font-size: 13px;
-    vertical-align: middle;
-  }
+  td { padding: 10px 14px; font-size: 13px; vertical-align: middle; }
 
-  .ic-num {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--green);
-    letter-spacing: .5px;
-  }
+  .ic-num   { font-family: var(--mono); font-size: 12px; color: var(--green); letter-spacing: .5px; }
   .name-cell { font-weight: 500; color: var(--bright); }
   .dob-cell  { font-family: var(--mono); font-size: 12px; color: var(--sub); }
-  .state-cell { font-size: 12px; }
-  .gender-m { color: #60A5FA; }
-  .gender-f { color: #F472B6; }
+  .gender-m  { color: #60A5FA; }
+  .gender-f  { color: #F472B6; }
   .date-cell { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .click-hint { font-size: 10px; color: var(--muted); font-family: var(--mono); }
 
   /* ── Invalid panel ── */
-  .invalid-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-bottom: 28px;
-  }
-  .invalid-panel p {
-    color: var(--sub);
-    font-size: 13px;
-    margin-top: 10px;
-    line-height: 1.7;
-  }
+  .invalid-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 28px; }
+  .invalid-panel p { color: var(--sub); font-size: 13px; margin-top: 10px; line-height: 1.7; }
   .invalid-panel strong { color: var(--text); }
 
-  /* ── Empty / loading states ── */
-  .state-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 48px 24px;
-    text-align: center;
-    color: var(--sub);
-    font-family: var(--mono);
-    font-size: 13px;
-    margin-bottom: 28px;
-  }
+  /* ── Empty/loading ── */
+  .state-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 48px 24px; text-align: center; color: var(--sub); font-family: var(--mono); font-size: 13px; margin-bottom: 28px; }
   .state-box .icon { font-size: 32px; margin-bottom: 12px; }
   .state-box p { margin-top: 6px; line-height: 1.6; }
 
-  /* ── Footer ── */
-  footer {
-    text-align: center;
-    color: var(--muted);
-    font-size: 11px;
-    font-family: var(--mono);
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
+  /* ══════════════════════════════════════════
+     MODAL
+  ══════════════════════════════════════════ */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: pop .18s ease;
+  }
+  @keyframes pop { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+  .modal-ic   { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--green); letter-spacing: 1px; }
+  .modal-name { font-size: 15px; font-weight: 600; color: var(--bright); margin-top: 4px; }
+
+  .modal-close {
+    background: none; border: 1px solid var(--border); color: var(--sub);
+    width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+    font-size: 16px; flex-shrink: 0; transition: all .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { border-color: var(--red); color: var(--red); }
+
+  .modal-body { padding: 20px 24px; }
+
+  .modal-section { margin-bottom: 24px; }
+  .modal-section-title {
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--green); margin-bottom: 12px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--green-dim);
   }
 
-  /* ── Responsive ── */
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 500px) { .field-grid { grid-template-columns: 1fr; } }
+
+  .field {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .field.full { grid-column: 1 / -1; }
+  .field-label { font-size: 10px; font-family: var(--mono); color: var(--sub); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
+  .field-value { font-family: var(--mono); font-size: 13px; color: var(--bright); font-weight: 600; }
+  .field-value.null { color: var(--muted); font-weight: 400; font-style: italic; }
+  .field-value.green { color: var(--green); }
+  .field-value.red   { color: var(--red); }
+  .field-value.blue  { color: #60A5FA; }
+  .field-value.pink  { color: #F472B6; }
+
+  /* ── Footer ── */
+  footer { text-align: center; color: var(--muted); font-size: 11px; font-family: var(--mono); padding-top: 12px; border-top: 1px solid var(--border); }
+
   @media (max-width: 640px) {
     .hide-mobile { display: none; }
     #search { width: 100%; }
@@ -361,8 +280,6 @@
 </header>
 
 <main>
-
-  <!-- Stats -->
   <div class="stats">
     <div class="stat-card green">
       <div class="stat-label">Valid Records</div>
@@ -386,23 +303,19 @@
     </div>
   </div>
 
-  <!-- Valid records -->
   <div class="section-header">
     <div class="section-title">
       ✅ Valid Records
       <span class="badge green" id="valid-count-badge">0</span>
+      <span class="click-hint">— click any row for full details</span>
     </div>
     <input type="text" id="search" placeholder="Search name, IC, state…" oninput="filterTable()">
   </div>
 
   <div id="valid-container">
-    <div class="state-box">
-      <div class="icon">📡</div>
-      <p>Loading valid records…</p>
-    </div>
+    <div class="state-box"><div class="icon">📡</div><p>Loading valid records…</p></div>
   </div>
 
-  <!-- Invalid summary -->
   <div class="section-header">
     <div class="section-title">
       ❌ Invalid Cache
@@ -411,38 +324,45 @@
   </div>
 
   <div class="invalid-panel">
-    <p>
-      <strong id="inv-count">—</strong> IC numbers have been confirmed as not registered in PERKESO
-      and are cached to avoid repeat API calls.<br>
-      Entries expire after <strong>30 days</strong> and are automatically re-checked —
-      a person may register with PERKESO at any time.
-    </p>
-    <p style="margin-top:14px">
-      <strong id="inv-expiring">—</strong> records expiring within the next 7 days will be re-queued soon.
-    </p>
+    <p><strong id="inv-count">—</strong> IC numbers confirmed not in PERKESO, cached to avoid repeat API calls.<br>
+       Entries expire after <strong>30 days</strong> and are automatically re-checked.</p>
+    <p style="margin-top:14px"><strong id="inv-expiring">—</strong> records expiring within 7 days will be re-queued soon.</p>
   </div>
-
 </main>
 
-<footer>
-  SOCSO Radar &nbsp;·&nbsp; data from ic_results/ &nbsp;·&nbsp;
-  auto-refreshes every 10 min &nbsp;·&nbsp;
-  <span id="footer-ts">—</span>
-</footer>
+<footer>SOCSO Radar &nbsp;·&nbsp; <span id="footer-ts">—</span></footer>
+
+<!-- ══════════════════ MODAL ══════════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-ic" id="m-ic">—</div>
+        <div class="modal-name" id="m-name">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
 
 <script>
-// ── Config ────────────────────────────────────────────────────────────────────
 const VALID_URL   = './ic_results/master_valid.json';
 const INVALID_URL = './ic_results/master_invalid.json';
-const REFRESH_MS  = 10 * 60 * 1000;   // 10 minutes
+const REFRESH_MS  = 10 * 60 * 1000;
 
-// ── State ─────────────────────────────────────────────────────────────────────
 let validData   = [];
 let invalidData = [];
 let sortCol     = 'checked_at';
-let sortDir     = -1;   // -1 = desc, 1 = asc
+let sortDir     = -1;
 
-// ── Load ──────────────────────────────────────────────────────────────────────
+// ── Race / Gender lookup ───────────────────────────────────────────────────
+const RACE = { 1:'Malay', 2:'Chinese', 3:'Indian', 4:'Others',
+               5:'Bumiputera Sabah', 6:'Bumiputera Sarawak', 7:'Other Bumiputera' };
+const GENDER = { 1:'Male', 2:'Female' };
+const NATIONALITY = { 0:'Malaysian', 1:'Malaysian' };
+
+// ── Load ──────────────────────────────────────────────────────────────────
 async function loadData() {
   setStatus('Refreshing…', false);
   try {
@@ -450,168 +370,344 @@ async function loadData() {
       fetch(VALID_URL   + '?t=' + Date.now()),
       fetch(INVALID_URL + '?t=' + Date.now()),
     ]);
-    validData   = vRes.ok   ? await vRes.json()   : [];
-    invalidData = iRes.ok   ? await iRes.json()   : [];
+    validData   = vRes.ok ? await vRes.json() : [];
+    invalidData = iRes.ok ? await iRes.json() : [];
     if (!Array.isArray(validData))   validData   = [];
     if (!Array.isArray(invalidData)) invalidData = [];
     renderAll();
     setStatus('Live · ' + fmtNow(), false);
   } catch (e) {
     setStatus('Error loading data', true);
-    showEmpty('valid-container',
-      '⚠️',
-      'Could not load master_valid.json',
-      'Make sure GitHub Pages is enabled and the file exists after the first run.');
+    showEmpty('valid-container', '⚠️', 'Could not load master_valid.json',
+      'Make sure GitHub Pages is enabled and the first run has completed.');
   }
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
+// ── Render all ────────────────────────────────────────────────────────────
 function renderAll() {
   renderStats();
   renderTable();
   renderInvalid();
-  document.getElementById('footer-ts').textContent =
-    'last loaded ' + fmtNow();
+  document.getElementById('footer-ts').textContent = 'last loaded ' + fmtNow();
 }
 
 function renderStats() {
-  const v = validData.length;
-  const i = invalidData.length;
-  const total = v + i;
-  const rate  = total > 0 ? ((v / total) * 100).toFixed(1) + '%' : '—';
-
+  const v = validData.length, i = invalidData.length, total = v + i;
   document.getElementById('s-valid').textContent   = v.toLocaleString();
   document.getElementById('s-invalid').textContent = i.toLocaleString();
-  document.getElementById('s-rate').textContent    = rate;
+  document.getElementById('s-rate').textContent    = total > 0 ? ((v/total)*100).toFixed(1)+'%' : '—';
   document.getElementById('valid-count-badge').textContent   = v;
   document.getElementById('invalid-count-badge').textContent = i;
 
-  // Last scan time from most recent valid checked_at
   const dates = validData.map(r => r.checked_at).filter(Boolean).sort();
   if (dates.length) {
     const last = dates[dates.length - 1];
-    document.getElementById('s-last').textContent = last.split(' ')[0];
-    document.getElementById('s-last-sub').textContent = last.split(' ')[1] + ' UTC';
+    document.getElementById('s-last').textContent    = last.split(' ')[0];
+    document.getElementById('s-last-sub').textContent = (last.split(' ')[1]||'') + ' UTC';
   }
 
-  // Expiring invalids (within 7 days)
-  const cutoff7 = new Date();
-  cutoff7.setDate(cutoff7.getDate() - 23);  // 30 - 7 = checked >23 days ago
-  const expiring = invalidData.filter(e => {
-    try { return new Date(e.t) < cutoff7; } catch { return false; }
-  }).length;
-  document.getElementById('s-invalid-sub').textContent =
-    i > 0 ? `${expiring} expiring within 7 days` : 'no cached invalids yet';
+  const cutoff7 = new Date(); cutoff7.setDate(cutoff7.getDate() - 23);
+  const exp = invalidData.filter(e => { try { return new Date(e.t) < cutoff7; } catch { return false; } }).length;
+  document.getElementById('s-invalid-sub').textContent = i > 0 ? `${exp} expiring within 7 days` : 'no cached invalids yet';
 }
 
 function renderTable() {
-  const container = document.getElementById('valid-container');
+  const c = document.getElementById('valid-container');
   if (!validData.length) {
     showEmpty('valid-container', '📡', 'No valid records yet',
-      'The script hasn\'t found any valid PERKESO ICs yet.<br>Run the checker or wait for the scheduled scan.');
+      'The script hasn\'t found any valid PERKESO ICs yet.<br>Trigger a workflow run or wait for the scheduled scan.');
     return;
   }
 
   const sorted = [...validData].sort((a, b) => {
-    let va = (a[sortCol] || a.perkeso_response?.debug?.data?.[0]?.[sortCol] || '').toString();
-    let vb = (b[sortCol] || b.perkeso_response?.debug?.data?.[0]?.[sortCol] || '').toString();
+    const va = String(a[sortCol] || '');
+    const vb = String(b[sortCol] || '');
     return va < vb ? sortDir : va > vb ? -sortDir : 0;
   });
 
   const cols = [
-    { key: 'ic_formatted',  label: 'IC Number' },
-    { key: 'name',          label: 'Name' },
-    { key: 'date_of_birth', label: 'DOB' },
-    { key: 'gender',        label: 'Gender' },
-    { key: 'pb_name',       label: 'State' },
-    { key: 'checked_at',    label: 'Checked' },
+    { key:'ic_formatted',  label:'IC Number' },
+    { key:'name',          label:'Name' },
+    { key:'date_of_birth', label:'DOB' },
+    { key:'gender',        label:'Gender' },
+    { key:'pb_name',       label:'State' },
+    { key:'checked_at',    label:'Checked' },
   ];
 
-  const headerCells = cols.map(c => {
-    const arrow = sortCol === c.key ? (sortDir === 1 ? '↑' : '↓') : '↕';
-    const cls   = sortCol === c.key ? 'sorted' : '';
-    return `<th class="${cls}" onclick="sortBy('${c.key}')">
-      ${c.label}<span class="sort-arrow">${arrow}</span>
+  const headerCells = cols.map(col => {
+    const arrow = sortCol === col.key ? (sortDir === 1 ? '↑' : '↓') : '↕';
+    return `<th class="${sortCol===col.key?'sorted':''}" onclick="sortBy('${col.key}')">
+      ${col.label} <span class="sort-arrow">${arrow}</span>
     </th>`;
   }).join('');
 
-  const rows = sorted.map(r => {
-    const pdata = r.perkeso_response?.debug?.data?.[0] || {};
-    const name   = pdata.name || '—';
-    const gender = r.gender || (pdata.genderId === 1 ? 'Male' : 'Female');
+  const rows = sorted.map((r, idx) => {
+    const pdata  = r.perkeso_response?.debug?.data?.[0] || {};
+    const name   = pdata.name || r.name || '—';
+    const gender = r.gender || (pdata.genderId===1 ? 'Male' : 'Female');
     const gClass = gender === 'Male' ? 'gender-m' : 'gender-f';
-    const checked = (r.checked_at || '').split(' ')[0];
-    return `<tr>
-      <td class="ic-num">${esc(r.ic_formatted || r.ic_number || '—')}</td>
+    const checked = (r.checked_at||'').split(' ')[0];
+    const origIdx = validData.indexOf(r);
+    return `<tr onclick="openModal(${origIdx})" title="Click to see full PERKESO record">
+      <td class="ic-num">${esc(r.ic_formatted||r.ic_number||'—')}</td>
       <td class="name-cell">${esc(name)}</td>
-      <td class="dob-cell">${esc(r.date_of_birth || pdata.dob || '—')}</td>
+      <td class="dob-cell">${esc(r.date_of_birth||pdata.dob||'—')}</td>
       <td class="${gClass}">${esc(gender)}</td>
-      <td class="state-cell">${esc(r.pb_name || '—')}</td>
+      <td class="state-cell">${esc(r.pb_name||'—')}</td>
       <td class="date-cell">${esc(checked)}</td>
     </tr>`;
   }).join('');
 
-  container.innerHTML = `
-    <div class="table-wrap">
-      <table id="valid-table">
-        <thead><tr>${headerCells}</tr></thead>
-        <tbody id="valid-tbody">${rows}</tbody>
-      </table>
-    </div>`;
+  c.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr>${headerCells}</tr></thead>
+    <tbody id="valid-tbody">${rows}</tbody>
+  </table></div>`;
 }
 
 function renderInvalid() {
-  document.getElementById('inv-count').textContent =
-    invalidData.length.toLocaleString();
-
-  const cutoff7 = new Date();
-  cutoff7.setDate(cutoff7.getDate() - 23);
-  const exp = invalidData.filter(e => {
-    try { return new Date(e.t) < cutoff7; } catch { return false; }
-  }).length;
+  document.getElementById('inv-count').textContent = invalidData.length.toLocaleString();
+  const cutoff7 = new Date(); cutoff7.setDate(cutoff7.getDate() - 23);
+  const exp = invalidData.filter(e => { try { return new Date(e.t) < cutoff7; } catch { return false; } }).length;
   document.getElementById('inv-expiring').textContent = exp.toLocaleString();
 }
 
-// ── Search / sort ─────────────────────────────────────────────────────────────
+// ── Modal ─────────────────────────────────────────────────────────────────
+function openModal(idx) {
+  const r     = validData[idx];
+  const pdata = r.perkeso_response?.debug?.data?.[0] || {};
+  const name  = pdata.name || r.name || '—';
+
+  document.getElementById('m-ic').textContent   = r.ic_formatted || r.ic_number || '—';
+  document.getElementById('m-name').textContent = name;
+
+  const gender = GENDER[pdata.genderId] || r.gender || '—';
+  const race   = RACE[pdata.raceId]     || '—';
+  const gClass = gender === 'Male' ? 'blue' : 'pink';
+
+  function fv(val, cls='') {
+    if (val === null || val === undefined || val === '' || val === 'null') {
+      return `<div class="field-value null">null</div>`;
+    }
+    return `<div class="field-value ${cls}">${esc(String(val))}</div>`;
+  }
+
+  document.getElementById('modal-body').innerHTML = `
+
+    <div class="modal-section">
+      <div class="modal-section-title">Personal Information</div>
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">IC Number</div>
+          ${fv(pdata.identificationNo || r.ic_number, 'green')}
+        </div>
+        <div class="field">
+          <div class="field-label">ID Type</div>
+          ${fv(pdata.idType === '2' ? 'MyKad (2)' : pdata.idType)}
+        </div>
+        <div class="field full">
+          <div class="field-label">Full Name</div>
+          ${fv(name, 'green')}
+        </div>
+        <div class="field">
+          <div class="field-label">Date of Birth</div>
+          ${fv(pdata.dob || r.date_of_birth)}
+        </div>
+        <div class="field">
+          <div class="field-label">Gender</div>
+          ${fv(gender, gClass)}
+        </div>
+        <div class="field">
+          <div class="field-label">Race</div>
+          ${fv(race)}
+        </div>
+        <div class="field">
+          <div class="field-label">Date of Death</div>
+          ${fv(pdata.dateOfDeath)}
+        </div>
+        <div class="field">
+          <div class="field-label">Foreign Worker</div>
+          ${fv(pdata.isForeignWorker !== undefined ? String(pdata.isForeignWorker) : null)}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Employment</div>
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">Start Date (Act 4 — SOCSO)</div>
+          ${fv(pdata.employmentStartDateAct4)}
+        </div>
+        <div class="field">
+          <div class="field-label">Start Date (Act 800 — EIS)</div>
+          ${fv(pdata.employmentStartDateAct800)}
+        </div>
+        <div class="field">
+          <div class="field-label">Last Contribution Act 4</div>
+          ${fv(pdata.lastContbAct4)}
+        </div>
+        <div class="field">
+          <div class="field-label">Last Amount Act 4</div>
+          ${fv(pdata.lastContbAct4Amount)}
+        </div>
+        <div class="field">
+          <div class="field-label">Last Contribution Act 800</div>
+          ${fv(pdata.lastContbAct800)}
+        </div>
+        <div class="field">
+          <div class="field-label">Last Amount Act 800</div>
+          ${fv(pdata.lastContbAct800Amount)}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Address</div>
+      <div class="field-grid">
+        <div class="field full">
+          <div class="field-label">Address Line 1</div>
+          ${fv(pdata.addressLine1)}
+        </div>
+        <div class="field full">
+          <div class="field-label">Address Line 2</div>
+          ${fv(pdata.addressLine2)}
+        </div>
+        <div class="field full">
+          <div class="field-label">Address Line 3</div>
+          ${fv(pdata.addressLine3)}
+        </div>
+        <div class="field">
+          <div class="field-label">Postcode</div>
+          ${fv(pdata.postcode)}
+        </div>
+        <div class="field">
+          <div class="field-label">City</div>
+          ${fv(pdata.individualCity)}
+        </div>
+        <div class="field">
+          <div class="field-label">State</div>
+          ${fv(pdata.individualState || r.pb_name)}
+        </div>
+        <div class="field">
+          <div class="field-label">Country</div>
+          ${fv(pdata.individualCountry)}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Next of Kin</div>
+      <div class="field-grid">
+        <div class="field full">
+          <div class="field-label">Name</div>
+          ${fv(pdata.nextOfKinName)}
+        </div>
+        <div class="field">
+          <div class="field-label">Relationship</div>
+          ${fv(pdata.nextOfKinRelationship)}
+        </div>
+        <div class="field">
+          <div class="field-label">Phone</div>
+          ${fv(pdata.nextOfKinPhoneNo)}
+        </div>
+        <div class="field">
+          <div class="field-label">Email</div>
+          ${fv(pdata.nextOfKinEmail)}
+        </div>
+        <div class="field full">
+          <div class="field-label">Address</div>
+          ${fv([pdata.nextOfKinAddress1, pdata.nextOfKinAddress2, pdata.nextOfKinAddress3].filter(Boolean).join(', ') || null)}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Passport / Work Permit</div>
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">Passport No</div>
+          ${fv(pdata.passport)}
+        </div>
+        <div class="field">
+          <div class="field-label">Passport Valid</div>
+          ${fv(pdata.passportStartDate && pdata.passportEndDate ? pdata.passportStartDate + ' → ' + pdata.passportEndDate : null)}
+        </div>
+        <div class="field">
+          <div class="field-label">Work Permit</div>
+          ${fv(pdata.workingPermit)}
+        </div>
+        <div class="field">
+          <div class="field-label">Permit Valid</div>
+          ${fv(pdata.permitStartDate && pdata.permitEndDate ? pdata.permitStartDate + ' → ' + pdata.permitEndDate : null)}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Scan Metadata</div>
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">Checked At</div>
+          ${fv(r.checked_at)}
+        </div>
+        <div class="field">
+          <div class="field-label">Place of Birth Code</div>
+          ${fv(r.pb_code + ' — ' + (r.pb_name||''))}
+        </div>
+        <div class="field">
+          <div class="field-label">Sequence</div>
+          ${fv(r.sequence)}
+        </div>
+        <div class="field">
+          <div class="field-label">Check Digit</div>
+          ${fv(r.check_digit)}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+// ── Search / Sort ─────────────────────────────────────────────────────────
 function filterTable() {
-  const q    = document.getElementById('search').value.toLowerCase();
-  const rows = document.querySelectorAll('#valid-tbody tr');
-  rows.forEach(row => {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('#valid-tbody tr').forEach(row => {
     row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
   });
 }
 
 function sortBy(col) {
-  if (sortCol === col) { sortDir *= -1; } else { sortCol = col; sortDir = -1; }
+  sortCol = col; sortDir = sortCol === col ? sortDir * -1 : -1;
   renderTable();
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────
 function setStatus(msg, isError) {
   document.getElementById('status-text').textContent = msg;
   document.getElementById('pulse-dot').className = 'pulse' + (isError ? ' error' : '');
 }
-
 function showEmpty(id, icon, title, body) {
-  document.getElementById(id).innerHTML = `
-    <div class="state-box">
-      <div class="icon">${icon}</div>
-      <strong style="color:var(--text)">${title}</strong>
-      <p>${body}</p>
-    </div>`;
+  document.getElementById(id).innerHTML = `<div class="state-box"><div class="icon">${icon}</div><strong style="color:var(--text)">${title}</strong><p>${body}</p></div>`;
 }
-
-function esc(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 function fmtNow() {
-  return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  return new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
 }
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
+// ── Boot ─────────────────────────────────────────────────────────────────
 loadData();
 setInterval(loadData, REFRESH_MS);
 </script>
