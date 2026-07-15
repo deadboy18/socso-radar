@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOCSO Radar — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080C14;
+    --surface:   #0F1623;
+    --surface2:  #161E2E;
+    --border:    #1E2D42;
+    --green:     #10B981;
+    --green-dim: #064E3B;
+    --red:       #F87171;
+    --red-dim:   #450A0A;
+    --amber:     #FBBF24;
+    --muted:     #4B5563;
+    --sub:       #6B7280;
+    --text:      #E2E8F0;
+    --bright:    #F8FAFC;
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Inter', sans-serif;
+    --radius:    8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .radar-icon {
+    width: 32px; height: 32px;
+    border: 2px solid var(--green);
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .radar-icon::before {
+    content: '';
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--green);
+    border-radius: 50%;
+    opacity: .5;
+  }
+  .radar-icon::after {
+    content: '';
+    position: absolute;
+    width: 50%; height: 2px;
+    background: var(--green);
+    top: 50%; left: 50%;
+    transform-origin: left center;
+    animation: sweep 3s linear infinite;
+  }
+  @keyframes sweep {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .logo-text h1 {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--bright);
+    letter-spacing: .5px;
+  }
+  .logo-text p {
+    font-size: 11px;
+    color: var(--sub);
+    margin-top: 1px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--sub);
+    font-family: var(--mono);
+  }
+  .pulse {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .pulse.error { background: var(--red); animation: none; }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .4; transform: scale(.7); }
+  }
+
+  #refresh-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--sub);
+    padding: 5px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--sans);
+    transition: border-color .2s, color .2s;
+  }
+  #refresh-btn:hover { border-color: var(--green); color: var(--green); }
+
+  /* ── Main layout ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+
+  /* ── Stat cards ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card.green { border-left: 3px solid var(--green); }
+  .stat-card.red   { border-left: 3px solid var(--red); }
+  .stat-card.amber { border-left: 3px solid var(--amber); }
+  .stat-card.plain { border-left: 3px solid var(--muted); }
+
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--sub);
+    font-family: var(--mono);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--bright);
+    line-height: 1;
+  }
+  .stat-sub {
+    font-size: 11px;
+    color: var(--sub);
+    margin-top: 6px;
+  }
+
+  /* ── Section header ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bright);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+  .badge.green { background: var(--green-dim); color: var(--green); }
+  .badge.red   { background: var(--red-dim);   color: var(--red); }
+
+  /* ── Search bar ── */
+  #search {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 12px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-family: var(--mono);
+    width: 240px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  #search:focus { border-color: var(--green); }
+  #search::placeholder { color: var(--muted); }
+
+  /* ── Table ── */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead tr {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--sub);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  th:hover { color: var(--text); }
+  th .sort-arrow { margin-left: 4px; opacity: .4; }
+  th.sorted .sort-arrow { opacity: 1; color: var(--green); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  td {
+    padding: 10px 14px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .ic-num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--green);
+    letter-spacing: .5px;
+  }
+  .name-cell { font-weight: 500; color: var(--bright); }
+  .dob-cell  { font-family: var(--mono); font-size: 12px; color: var(--sub); }
+  .state-cell { font-size: 12px; }
+  .gender-m { color: #60A5FA; }
+  .gender-f { color: #F472B6; }
+  .date-cell { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  /* ── Invalid panel ── */
+  .invalid-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+  .invalid-panel p {
+    color: var(--sub);
+    font-size: 13px;
+    margin-top: 10px;
+    line-height: 1.7;
+  }
+  .invalid-panel strong { color: var(--text); }
+
+  /* ── Empty / loading states ── */
+  .state-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--sub);
+    font-family: var(--mono);
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+  .state-box .icon { font-size: 32px; margin-bottom: 12px; }
+  .state-box p { margin-top: 6px; line-height: 1.6; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    font-family: var(--mono);
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .hide-mobile { display: none; }
+    #search { width: 100%; }
+    .section-header { flex-direction: column; align-items: flex-start; }
+    .stat-value { font-size: 22px; }
+    td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="radar-icon"></div>
+    <div class="logo-text">
+      <h1>SOCSO Radar</h1>
+      <p>PERKESO IC Lookup — Live Dashboard</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="pulse" id="pulse-dot"></div>
+      <span id="status-text">Loading...</span>
+    </div>
+    <button id="refresh-btn" onclick="loadData()">↻ Refresh</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card green">
+      <div class="stat-label">Valid Records</div>
+      <div class="stat-value" id="s-valid">—</div>
+      <div class="stat-sub">confirmed in PERKESO</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">Invalid Cached</div>
+      <div class="stat-value" id="s-invalid">—</div>
+      <div class="stat-sub" id="s-invalid-sub">re-checked after 30 days</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-label">Hit Rate</div>
+      <div class="stat-value" id="s-rate">—</div>
+      <div class="stat-sub">valid / (valid + invalid)</div>
+    </div>
+    <div class="stat-card plain">
+      <div class="stat-label">Last Scan</div>
+      <div class="stat-value" style="font-size:16px;padding-top:6px" id="s-last">—</div>
+      <div class="stat-sub" id="s-last-sub">auto-runs 4× per day</div>
+    </div>
+  </div>
+
+  <!-- Valid records -->
+  <div class="section-header">
+    <div class="section-title">
+      ✅ Valid Records
+      <span class="badge green" id="valid-count-badge">0</span>
+    </div>
+    <input type="text" id="search" placeholder="Search name, IC, state…" oninput="filterTable()">
+  </div>
+
+  <div id="valid-container">
+    <div class="state-box">
+      <div class="icon">📡</div>
+      <p>Loading valid records…</p>
+    </div>
+  </div>
+
+  <!-- Invalid summary -->
+  <div class="section-header">
+    <div class="section-title">
+      ❌ Invalid Cache
+      <span class="badge red" id="invalid-count-badge">0</span>
+    </div>
+  </div>
+
+  <div class="invalid-panel">
+    <p>
+      <strong id="inv-count">—</strong> IC numbers have been confirmed as not registered in PERKESO
+      and are cached to avoid repeat API calls.<br>
+      Entries expire after <strong>30 days</strong> and are automatically re-checked —
+      a person may register with PERKESO at any time.
+    </p>
+    <p style="margin-top:14px">
+      <strong id="inv-expiring">—</strong> records expiring within the next 7 days will be re-queued soon.
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  SOCSO Radar &nbsp;·&nbsp; data from ic_results/ &nbsp;·&nbsp;
+  auto-refreshes every 10 min &nbsp;·&nbsp;
+  <span id="footer-ts">—</span>
+</footer>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+const VALID_URL   = './ic_results/master_valid.json';
+const INVALID_URL = './ic_results/master_invalid.json';
+const REFRESH_MS  = 10 * 60 * 1000;   // 10 minutes
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let validData   = [];
+let invalidData = [];
+let sortCol     = 'checked_at';
+let sortDir     = -1;   // -1 = desc, 1 = asc
+
+// ── Load ──────────────────────────────────────────────────────────────────────
+async function loadData() {
+  setStatus('Refreshing…', false);
+  try {
+    const [vRes, iRes] = await Promise.all([
+      fetch(VALID_URL   + '?t=' + Date.now()),
+      fetch(INVALID_URL + '?t=' + Date.now()),
+    ]);
+    validData   = vRes.ok   ? await vRes.json()   : [];
+    invalidData = iRes.ok   ? await iRes.json()   : [];
+    if (!Array.isArray(validData))   validData   = [];
+    if (!Array.isArray(invalidData)) invalidData = [];
+    renderAll();
+    setStatus('Live · ' + fmtNow(), false);
+  } catch (e) {
+    setStatus('Error loading data', true);
+    showEmpty('valid-container',
+      '⚠️',
+      'Could not load master_valid.json',
+      'Make sure GitHub Pages is enabled and the file exists after the first run.');
+  }
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderStats();
+  renderTable();
+  renderInvalid();
+  document.getElementById('footer-ts').textContent =
+    'last loaded ' + fmtNow();
+}
+
+function renderStats() {
+  const v = validData.length;
+  const i = invalidData.length;
+  const total = v + i;
+  const rate  = total > 0 ? ((v / total) * 100).toFixed(1) + '%' : '—';
+
+  document.getElementById('s-valid').textContent   = v.toLocaleString();
+  document.getElementById('s-invalid').textContent = i.toLocaleString();
+  document.getElementById('s-rate').textContent    = rate;
+  document.getElementById('valid-count-badge').textContent   = v;
+  document.getElementById('invalid-count-badge').textContent = i;
+
+  // Last scan time from most recent valid checked_at
+  const dates = validData.map(r => r.checked_at).filter(Boolean).sort();
+  if (dates.length) {
+    const last = dates[dates.length - 1];
+    document.getElementById('s-last').textContent = last.split(' ')[0];
+    document.getElementById('s-last-sub').textContent = last.split(' ')[1] + ' UTC';
+  }
+
+  // Expiring invalids (within 7 days)
+  const cutoff7 = new Date();
+  cutoff7.setDate(cutoff7.getDate() - 23);  // 30 - 7 = checked >23 days ago
+  const expiring = invalidData.filter(e => {
+    try { return new Date(e.t) < cutoff7; } catch { return false; }
+  }).length;
+  document.getElementById('s-invalid-sub').textContent =
+    i > 0 ? `${expiring} expiring within 7 days` : 'no cached invalids yet';
+}
+
+function renderTable() {
+  const container = document.getElementById('valid-container');
+  if (!validData.length) {
+    showEmpty('valid-container', '📡', 'No valid records yet',
+      'The script hasn\'t found any valid PERKESO ICs yet.<br>Run the checker or wait for the scheduled scan.');
+    return;
+  }
+
+  const sorted = [...validData].sort((a, b) => {
+    let va = (a[sortCol] || a.perkeso_response?.debug?.data?.[0]?.[sortCol] || '').toString();
+    let vb = (b[sortCol] || b.perkeso_response?.debug?.data?.[0]?.[sortCol] || '').toString();
+    return va < vb ? sortDir : va > vb ? -sortDir : 0;
+  });
+
+  const cols = [
+    { key: 'ic_formatted',  label: 'IC Number' },
+    { key: 'name',          label: 'Name' },
+    { key: 'date_of_birth', label: 'DOB' },
+    { key: 'gender',        label: 'Gender' },
+    { key: 'pb_name',       label: 'State' },
+    { key: 'checked_at',    label: 'Checked' },
+  ];
+
+  const headerCells = cols.map(c => {
+    const arrow = sortCol === c.key ? (sortDir === 1 ? '↑' : '↓') : '↕';
+    const cls   = sortCol === c.key ? 'sorted' : '';
+    return `<th class="${cls}" onclick="sortBy('${c.key}')">
+      ${c.label}<span class="sort-arrow">${arrow}</span>
+    </th>`;
+  }).join('');
+
+  const rows = sorted.map(r => {
+    const pdata = r.perkeso_response?.debug?.data?.[0] || {};
+    const name   = pdata.name || '—';
+    const gender = r.gender || (pdata.genderId === 1 ? 'Male' : 'Female');
+    const gClass = gender === 'Male' ? 'gender-m' : 'gender-f';
+    const checked = (r.checked_at || '').split(' ')[0];
+    return `<tr>
+      <td class="ic-num">${esc(r.ic_formatted || r.ic_number || '—')}</td>
+      <td class="name-cell">${esc(name)}</td>
+      <td class="dob-cell">${esc(r.date_of_birth || pdata.dob || '—')}</td>
+      <td class="${gClass}">${esc(gender)}</td>
+      <td class="state-cell">${esc(r.pb_name || '—')}</td>
+      <td class="date-cell">${esc(checked)}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="table-wrap">
+      <table id="valid-table">
+        <thead><tr>${headerCells}</tr></thead>
+        <tbody id="valid-tbody">${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderInvalid() {
+  document.getElementById('inv-count').textContent =
+    invalidData.length.toLocaleString();
+
+  const cutoff7 = new Date();
+  cutoff7.setDate(cutoff7.getDate() - 23);
+  const exp = invalidData.filter(e => {
+    try { return new Date(e.t) < cutoff7; } catch { return false; }
+  }).length;
+  document.getElementById('inv-expiring').textContent = exp.toLocaleString();
+}
+
+// ── Search / sort ─────────────────────────────────────────────────────────────
+function filterTable() {
+  const q    = document.getElementById('search').value.toLowerCase();
+  const rows = document.querySelectorAll('#valid-tbody tr');
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function sortBy(col) {
+  if (sortCol === col) { sortDir *= -1; } else { sortCol = col; sortDir = -1; }
+  renderTable();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function setStatus(msg, isError) {
+  document.getElementById('status-text').textContent = msg;
+  document.getElementById('pulse-dot').className = 'pulse' + (isError ? ' error' : '');
+}
+
+function showEmpty(id, icon, title, body) {
+  document.getElementById(id).innerHTML = `
+    <div class="state-box">
+      <div class="icon">${icon}</div>
+      <strong style="color:var(--text)">${title}</strong>
+      <p>${body}</p>
+    </div>`;
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtNow() {
+  return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+loadData();
+setInterval(loadData, REFRESH_MS);
+</script>
+</body>
+</html>

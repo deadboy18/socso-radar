@@ -1,0 +1,83 @@
+name: PERKESO IC Checker
+
+on:
+  schedule:
+    - cron: '0 2,8,14,20 * * *'   # 4x per day: 2am, 8am, 2pm, 8pm UTC
+
+  workflow_dispatch:                # manual trigger from the Actions tab
+    inputs:
+      max_checks:
+        description: 'Number of ICs to check this run'
+        default: '200'
+      from_year:
+        description: 'Birth year from'
+        default: '1965'
+      to_year:
+        description: 'Birth year to'
+        default: '2000'
+      workers:
+        description: 'Concurrent workers (1-3 recommended)'
+        default: '2'
+      ttl:
+        description: 'Days before invalid records expire and get re-checked'
+        default: '30'
+
+jobs:
+  run-checker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: write   # needed to push results back to the repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run IC Checker
+        run: |
+          python ic_checker.py \
+            --mode 1 \
+            --workers "${{ github.event.inputs.workers || '2' }}" \
+            --from-year "${{ github.event.inputs.from_year || '1965' }}" \
+            --to-year "${{ github.event.inputs.to_year || '2000' }}" \
+            --max-checks "${{ github.event.inputs.max_checks || '200' }}" \
+            --ttl "${{ github.event.inputs.ttl || '30' }}"
+
+      - name: Commit updated master files
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Pull latest first to avoid conflicts between overlapping runs
+          git pull --rebase origin main
+
+          git add ic_results/master_valid.json ic_results/master_invalid.json 2>/dev/null || true
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            VALID=$(python -c "
+import json, os
+f = 'ic_results/master_valid.json'
+print(len(json.load(open(f))) if os.path.exists(f) else 0)
+" 2>/dev/null || echo "?")
+            INVALID=$(python -c "
+import json, os
+f = 'ic_results/master_invalid.json'
+print(len(json.load(open(f))) if os.path.exists(f) else 0)
+" 2>/dev/null || echo "?")
+            git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC') | valid: ${VALID} | invalid: ${INVALID}"
+            git push
+          fi
