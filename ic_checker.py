@@ -44,9 +44,9 @@ VALID_FILE       = os.path.join(OUTPUT_DIR, "master_valid.json")
 INVALID_FILE     = os.path.join(OUTPUT_DIR, "master_invalid.json")
 
 INVALID_TTL_DAYS = 30     # re-check invalids after this many days
-DELAY_MIN        = 2.0
-DELAY_MAX        = 3.0
-WORKERS_MAX      = 5
+DELAY_MIN        = 1.5   # ~2 req/s at 3 workers — safe for gov API, 2.5× faster than before
+DELAY_MAX        = 60.0  # maximum backoff — gives PERKESO time to cool down
+WORKERS_MAX      = 3     # 3 workers × 1.5s = ~2 req/s total — sweet spot of speed vs safety
 STATS_EVERY      = 10
 FLUSH_EVERY      = 25     # write invalid buffer to disk every N additions
 
@@ -282,34 +282,55 @@ class PersistentState:
 # ══════════════════════════════════════════════════════════════════════════════
 class RateController:
     def __init__(self, workers):
-        self.delay   = (DELAY_MIN + DELAY_MAX) / 2
+        self.delay   = DELAY_MIN          # start at minimum — ramp up only if needed
         self.workers = workers
-        self._w      = deque(maxlen=20)
+        self._w      = deque(maxlen=50)   # larger window = more stable decisions
         self._lock   = threading.Lock()
+        self._rate_limited_until = 0      # epoch time — pause all workers if 429
+
+    def rate_limited(self, retry_after: int = 60):
+        """Call when HTTP 429 received. Pauses all workers for retry_after seconds."""
+        with self._lock:
+            self._rate_limited_until = time.time() + retry_after
+            self.delay = min(self.delay * 2, DELAY_MAX)
+        safe_print(f"\n  🚫 429 RATE LIMITED — pausing all workers for {retry_after}s\n")
+        time.sleep(retry_after)
+
+    def wait_if_limited(self):
+        """Workers call this before each request to honour any active 429 pause."""
+        pause = self._rate_limited_until - time.time()
+        if pause > 0:
+            time.sleep(pause)
 
     def record(self, ok: bool):
         with self._lock:
             self._w.append(ok)
-            if len(self._w) < 5: return
+            if len(self._w) < 10: return          # need at least 10 samples
             err = self._w.count(False) / len(self._w)
-            if err > 0.30:
-                self.delay   = min(self.delay + 0.5, DELAY_MAX)
-                self.workers = max(1, self.workers - 1)
-            elif err > 0.10:
-                self.delay   = min(self.delay + 0.2, DELAY_MAX)
-            elif err == 0 and len(self._w) == 20:
-                self.delay   = max(self.delay - 0.1, DELAY_MIN)
-                self.workers = min(self.workers + 1, WORKERS_MAX)
-            elif err < 0.05:
-                self.delay   = max(self.delay - 0.05, DELAY_MIN)
 
-    def get(self):
-        with self._lock: return self.delay, self.workers
+            if err > 0.40:
+                # Heavy errors — double the delay (exponential back-off), cap at MAX
+                self.delay = min(self.delay * 2, DELAY_MAX)
+            elif err > 0.20:
+                # Moderate errors — add 3 seconds
+                self.delay = min(self.delay + 3.0, DELAY_MAX)
+            elif err > 0.05:
+                # Light errors — add 1 second
+                self.delay = min(self.delay + 1.0, DELAY_MAX)
+            elif err == 0 and len(self._w) == 50:
+                # Perfect run for 50 checks — nudge delay down slightly
+                self.delay = max(self.delay - 0.2, DELAY_MIN)
+
+    def get_delay(self):
+        with self._lock: return self.delay
 
     def summary(self):
         with self._lock:
             e = self._w.count(False) if self._w else 0
-            return f"delay={self.delay:.1f}s  workers={self.workers}  err={e}/{len(self._w)}"
+            lim = max(0, self._rate_limited_until - time.time())
+            s = f"delay={self.delay:.1f}s  err={e}/{len(self._w)}"
+            if lim > 0: s += f"  RATE-LIMITED ({lim:.0f}s remaining)"
+            return s
 
 # ── Print lock ────────────────────────────────────────────────────────────────
 _plock = threading.Lock()
@@ -318,8 +339,10 @@ def safe_print(*a, **kw):
 
 # ── Core check ────────────────────────────────────────────────────────────────
 def do_check(gen, index, rate_ctrl, state, run_stats):
-    delay, _ = rate_ctrl.get()
-    time.sleep(random.uniform(delay * 0.8, delay * 1.2))
+    # Honour any active rate-limit pause before sleeping the normal delay
+    rate_ctrl.wait_if_limited()
+    delay = rate_ctrl.get_delay()
+    time.sleep(random.uniform(delay, delay * 1.3))   # slight positive jitter only
 
     icno = gen["ic_number"]
     now  = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -328,6 +351,14 @@ def do_check(gen, index, rate_ctrl, state, run_stats):
         api = check_perkeso(icno)
         rate_ctrl.record(True)
         is_valid = api.get("akses") == 1
+    except requests.exceptions.HTTPError as e:
+        # 429 = explicit rate limit — back off hard
+        if e.response is not None and e.response.status_code == 429:
+            retry_after = int(e.response.headers.get("Retry-After", 60))
+            rate_ctrl.rate_limited(retry_after)
+        api      = {"error": str(e)}
+        is_valid = None
+        rate_ctrl.record(False)
     except requests.exceptions.RequestException as e:
         api      = {"error": str(e)}
         is_valid = None
