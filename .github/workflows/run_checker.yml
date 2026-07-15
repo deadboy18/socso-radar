@@ -1,23 +1,18 @@
 name: PERKESO IC Checker
 
-# ── How infinite chaining works ────────────────────────────────────────────────
-# 1. You click "Run workflow" once to start the chain.
-# 2. Each run completes → workflow_run event fires → next run starts.
-# 3. The hourly cron is a safety net: restarts the chain if it breaks.
-# 4. To stop: cancel the currently running job in the Actions tab.
-# ──────────────────────────────────────────────────────────────────────────────
 on:
   workflow_run:
     workflows: ["PERKESO IC Checker"]
     types: [completed]
-
   schedule:
-    - cron: '0 * * * *'   # hourly fallback — restarts chain after any failure
-
+    - cron: '0 * * * *'   # hourly fallback if chain breaks
   workflow_dispatch:
     inputs:
+      mode:
+        description: '1=Adaptive random (recommended)  4=Systematic A-Z'
+        default: '1'
       runtime_minutes:
-        description: 'Minutes to scan per job (default 22)'
+        description: 'Minutes to scan per job'
         default: '22'
       from_year:
         description: 'Birth year from'
@@ -26,8 +21,6 @@ on:
         description: 'Birth year to'
         default: '2000'
 
-# Only one run at a time. If a new trigger arrives while one is running,
-# queue it — never cancel a running scan mid-way.
 concurrency:
   group: perkeso-checker
   cancel-in-progress: false
@@ -35,12 +28,11 @@ concurrency:
 jobs:
   run-checker:
     runs-on: ubuntu-latest
-    timeout-minutes: 40   # 2 min setup + 2 min rest + 22 min scan + 5 min commit + buffer
+    timeout-minutes: 40
 
     permissions:
       contents: write
 
-    # Chain only on success. On failure the hourly cron restarts cleanly.
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'schedule' ||
@@ -62,41 +54,34 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # ── Rest period between chained runs ──────────────────────────────────
-      # Gives PERKESO's API ~2 minutes to breathe between consecutive jobs.
-      # Skipped on the very first manual trigger (no previous run exists).
-      - name: Rest between runs
+      - name: Rest between chained runs
         if: github.event_name == 'workflow_run'
         run: |
-          echo "Resting 120 seconds before next scan batch..."
+          echo "Resting 120s before next batch..."
           sleep 120
 
-      # ── Main scan ─────────────────────────────────────────────────────────
-      # Rate: 3 workers × 1.5s delay = ~2 req/s = 120 req/min
-      # Gov API nginx typically allows 10-100 req/s before throttling.
-      # Our script backs off automatically on any errors up to 60s max.
       - name: Run IC Checker
         run: |
           python ic_checker.py \
-            --mode 1 \
+            --mode "${{ github.event.inputs.mode || '1' }}" \
             --workers 3 \
             --from-year "${{ github.event.inputs.from_year || '1965' }}" \
             --to-year   "${{ github.event.inputs.to_year   || '2000' }}" \
-            --max-runtime "${{ github.event.inputs.runtime_minutes || '22' }}" \
-            --ttl 30
+            --max-runtime "${{ github.event.inputs.runtime_minutes || '22' }}"
 
-      # ── Commit results ────────────────────────────────────────────────────
-      - name: Commit updated master files
+      - name: Commit results
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main
-          git add ic_results/master_valid.json ic_results/master_invalid.json 2>/dev/null || true
+          git add ic_results/master_valid.json \
+                  ic_results/master_invalid.json \
+                  ic_results/master_progress.json 2>/dev/null || true
           if git diff --staged --quiet; then
-            echo "No new results to commit."
+            echo "Nothing to commit."
           else
             VALID=$(python -c "import json,os; f='ic_results/master_valid.json'; print(len(json.load(open(f))) if os.path.exists(f) else 0)" 2>/dev/null || echo "?")
-            INVALID=$(python -c "import json,os; f='ic_results/master_invalid.json'; print(len(json.load(open(f))) if os.path.exists(f) else 0)" 2>/dev/null || echo "?")
-            git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC') | valid: ${VALID} | invalid: ${INVALID}"
+            PCT=$(python -c "import json,os; f='ic_results/master_progress.json'; p=json.load(open(f)) if os.path.exists(f) else {}; slots=p.get('dob_states_completed',0); print(f'{slots/724155*100:.3f}%')" 2>/dev/null || echo "?")
+            git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC') | valid: ${VALID} | coverage: ${PCT}"
             git push
           fi
