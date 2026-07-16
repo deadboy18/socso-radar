@@ -64,15 +64,24 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
+
+          # Stage result files first
           git add ic_results/master_valid.json \
                   ic_results/master_invalid.json \
                   ic_results/master_progress.json 2>/dev/null || true
+
+          # Exit early if nothing changed
           if git diff --staged --quiet; then
             echo "Nothing to commit."
-          else
-            VALID=$(python -c "import json,os; f='ic_results/master_valid.json'; print(len(json.load(open(f))) if os.path.exists(f) else 0)" 2>/dev/null || echo "?")
-            INVALID=$(python -c "import json,os; f='ic_results/master_invalid.json'; print(len(json.load(open(f))) if os.path.exists(f) else 0)" 2>/dev/null || echo "?")
-            git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC') | valid: ${VALID} | invalid: ${INVALID}"
-            git push
+            exit 0
           fi
+
+          # --autostash: stashes our staged changes before rebasing,
+          # reapplies them after — fixes "unstaged changes" error
+          git pull --rebase --autostash origin main
+
+          VALID=$(python -c "import json,os; f='ic_results/master_valid.json'; print(len(json.load(open(f))) if os.path.exists(f) else 0)" 2>/dev/null || echo "?")
+          INVALID=$(python -c "import json,os; f='ic_results/master_invalid.json'; print(len(json.load(open(f))) if os.path.exists(f) else 0)" 2>/dev/null || echo "?")
+
+          git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC') | valid: ${VALID} | invalid: ${INVALID}"
+          git push
